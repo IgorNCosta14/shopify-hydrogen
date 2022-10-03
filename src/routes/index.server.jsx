@@ -26,6 +26,9 @@ export default function Index({country = {isoCode: 'US'}}) {
         <Suspense fallback={<BoxFallback />}>
           <FeaturedCollectionBox country={country} />
         </Suspense>
+        <Suspense fallback={<BoxFallback />}>
+          <FeaturedProductsBox country={country} collection={1} />
+        </Suspense>
       </div>
     </Layout>
   );
@@ -54,10 +57,10 @@ function SeoForHomepage() {
 }
 
 function BoxFallback() {
-  return <div className="bg-white p-12 shadow-xl rounded-xl mb-10 h-40"></div>;
+  return <div className="p-12 mb-10 h-40"></div>;
 }
 
-function FeaturedProductsBox({country}) {
+function FeaturedProductsBox({country, collection = 0}) {
   const {data} = useShopQuery({
     query: QUERY,
     variables: {
@@ -67,29 +70,29 @@ function FeaturedProductsBox({country}) {
   });
 
   const collections = data ? flattenConnection(data.collections) : [];
-  const featuredProductsCollection = collections[0];
+  const featuredProductsCollection = collections[collection];
   const featuredProducts = featuredProductsCollection
     ? flattenConnection(featuredProductsCollection.products)
     : null;
 
   return (
-    <div className="bg-white p-12 shadow-xl rounded-xl mb-10">
+    <div className="p-12 mb-10">
       {featuredProductsCollection ? (
         <>
-          <div className="flex justify-between items-center mb-8 text-md font-medium">
-            <span className="text-black uppercase">
+          <div className="flex justify-between items-center mb-8 text-xl font-medium">
+            <span className="text-black font-bold uppercase w-full md:w-auto text-center">
               {featuredProductsCollection.title}
             </span>
             <span className="hidden md:inline-flex">
               <Link
                 to={`/collections/${featuredProductsCollection.handle}`}
-                className="text-blue-600 hover:underline"
+                className="text-tertiary hover:underline capitalize"
               >
                 Shop all
               </Link>
             </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-0">
             {featuredProducts.map((product) => (
               <div key={product.id}>
                 <ProductCard product={product} />
@@ -99,7 +102,7 @@ function FeaturedProductsBox({country}) {
           <div className="md:hidden text-center">
             <Link
               to={`/collections/${featuredProductsCollection.handle}`}
-              className="text-blue-600"
+              className="text-tertiary capitalize text-xl"
             >
               Shop all
             </Link>
